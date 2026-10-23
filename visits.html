@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Antenatal Visits | Maternity Care</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar"><div class="brand">✚ Maternity Care</div><nav><a href="{{ url_for('index') }}">Patients</a><a class="active" href="{{ url_for('visits') }}">Antenatal Visits</a></nav></header>
+<main class="container">
+  <section class="hero"><div><p class="eyebrow">FOLLOW-UP RECORDS</p><h1>Antenatal visit history</h1><p class="muted">Record measurements and review previous visits.</p></div><div class="hero-icon">♡</div></section>
+  {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+  <section class="panel">
+    <h2>Select a pregnancy</h2>
+    <form method="get" action="{{ url_for('visits') }}" class="select-row">
+      <select name="pregnancy_id" required><option value="">Choose patient record</option>{% for p in pregnancies %}<option value="{{ p.PregnancyID }}" {% if selected_id == p.PregnancyID %}selected{% endif %}>#{{ p.PregnancyID }} — {{ p.Name }}</option>{% endfor %}</select>
+      <button type="submit">Load history</button>
+    </form>
+  </section>
+  {% if selected %}
+  <section class="panel">
+    <div class="section-heading"><div><h2>Log a new visit</h2><p class="muted">Patient: {{ selected.Name }} · Record #{{ selected.PregnancyID }}</p></div></div>
+    <form method="post" action="{{ url_for('add_visit') }}" class="form-grid">
+      <input type="hidden" name="pregnancy_id" value="{{ selected.PregnancyID }}">
+      <label>Weight (kg)<input name="weight" inputmode="decimal" placeholder="e.g. 65.5"></label>
+      <label>Blood pressure (mmHg)<input name="bp" placeholder="e.g. 120/80"></label>
+      <label>Fetal heart rate (BPM)<input name="fhr" inputmode="numeric" placeholder="e.g. 140"></label>
+      <label class="wide">Clinical notes<textarea name="notes" rows="3" placeholder="Enter visit notes"></textarea></label>
+      <div class="form-action"><button type="submit">Save visit</button></div>
+    </form>
+  </section>
+  <section class="panel">
+    <h2>Visit history</h2>
+    {% if history %}<div class="table-wrap"><table><thead><tr><th>Visit ID</th><th>Date</th><th>Weight</th><th>Blood pressure</th><th>Fetal heart rate</th><th>Clinical notes</th></tr></thead><tbody>{% for v in history %}<tr><td>{{ v.VisitID }}</td><td>{{ v.VisitDate }}</td><td>{{ v.Weight or '—' }}</td><td>{{ v.BP or '—' }}</td><td>{{ v.FHR or '—' }}</td><td>{{ v.Notes or '—' }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty"><span>♡</span><h3>No visits recorded</h3><p>Use the form above to save the first antenatal visit.</p></div>{% endif %}
+  </section>
+  {% elif pregnancies %}<section class="panel empty"><h3>Choose a patient record</h3><p>Load the pregnancy record to add or view antenatal visits.</p></section>
+  {% else %}<section class="panel empty"><h3>No active pregnancy records</h3><p>Register a patient first.</p><a class="small-link" href="{{ url_for('index') }}">Go to patient registration</a></section>{% endif %}
+  <p class="disclaimer">School-project prototype. Use fictional data for demonstrations; do not store real patient data without proper security and authorization.</p>
+</main>
+</body>
+</html>

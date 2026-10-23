@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maternity Care Information System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">✚ Maternity Care</div>
+  <nav><a class="active" href="{{ url_for('index') }}">Patients</a><a href="{{ url_for('visits') }}">Antenatal Visits</a></nav>
+</header>
+<main class="container">
+  <section class="hero">
+    <div><p class="eyebrow">MATERNAL HEALTH RECORDS</p><h1>Maternity Care Information System</h1><p class="muted">Register pregnancies and keep antenatal visit records in one place.</p></div>
+    <div class="hero-icon">♡</div>
+  </section>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}{% for category, message in messages %}<div class="alert {{ category }}">{{ message }}</div>{% endfor %}{% endif %}
+  {% endwith %}
+  <section class="panel">
+    <div class="section-heading"><div><h2>Register a patient</h2><p class="muted">Fields marked * are required.</p></div></div>
+    <form action="{{ url_for('register') }}" method="post" class="form-grid">
+      <label>First name *<input name="first_name" required autocomplete="given-name"></label>
+      <label>Last name *<input name="last_name" required autocomplete="family-name"></label>
+      <label>Date of birth *<input type="date" name="dob" required></label>
+      <label>Blood group<select name="blood_type"><option value="">Choose blood group</option>{% for bt in blood_types %}<option>{{ bt }}</option>{% endfor %}</select></label>
+      <label>Last menstrual period (LMP) *<input type="date" name="lmp" required></label>
+      <div class="form-action"><button type="submit">Register patient</button></div>
+    </form>
+  </section>
+  <section class="panel">
+    <div class="section-heading"><div><h2>Active pregnancies</h2><p class="muted">{{ patients|length }} record(s)</p></div></div>
+    {% if patients %}
+    <div class="table-wrap"><table><thead><tr><th>Record ID</th><th>Patient</th><th>Date of birth</th><th>Blood group</th><th>LMP</th><th>Estimated delivery</th><th>Action</th></tr></thead><tbody>
+    {% for p in patients %}<tr><td>#{{ p.PregnancyID }}</td><td><strong>{{ p.Name }}</strong></td><td>{{ p.DOB }}</td><td>{{ p.BloodType or '—' }}</td><td>{{ p.LMP }}</td><td>{{ p.EDD }}</td><td><a class="small-link" href="{{ url_for('visits', pregnancy_id=p.PregnancyID) }}">View visits</a></td></tr>{% endfor %}
+    </tbody></table></div>
+    {% else %}<div class="empty"><span>♡</span><h3>No patients registered yet</h3><p>Complete the form above to add the first patient record.</p></div>{% endif %}
+  </section>
+  <p class="disclaimer">School-project prototype. Use fictional data for demonstrations; do not store real patient data without proper security and authorization.</p>
+</main>
+</body>
+</html>
