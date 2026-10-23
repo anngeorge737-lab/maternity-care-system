@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime, timedelta
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=".", static_folder=".", static_url_path="")
 app.secret_key = os.environ.get("SECRET_KEY", "change-this-before-public-use")
 DB_PATH = os.environ.get("DATABASE_PATH", os.path.join(os.path.dirname(__file__), "maternity_care.db"))
 
